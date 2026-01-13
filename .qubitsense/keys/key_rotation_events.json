@@ -1,0 +1,14 @@
+[
+  {
+    "eventId": "event_1768326181121_b93e027e",
+    "timestamp": 1768326181121,
+    "eventType": "KEY_CREATED",
+    "keyId": "key_1768326181102_c5d4e980a977182d",
+    "reason": "Initial key creation",
+    "performedBy": "MANUAL",
+    "metadata": {
+      "algorithm": "AES-256-GCM",
+      "strength": 256
+    }
+  }
+]
