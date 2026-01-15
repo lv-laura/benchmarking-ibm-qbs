@@ -1,0 +1,120 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+                                                          % if you need a4paper
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{url}
+
+
+\title{Benchmarking Superconducting Qubits with Randomized Benchmarking in Qiskit}
+\author{Laura L. Vilela, Faculty of Science and Technology, University of Coimbra}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This project investigates the fidelity of quantum gates in superconducting qubits using Randomised Benchmarking (RB) and Interleaved Randomised Benchmarking (IRB). Experiments will be implemented in Qiskit and executed both on noisy simulators with device-calibrated noise models and on real IBM Quantum hardware. The study aims to extract the error per Clifford (EPC) for single- and two-qubit gates, analyse discrepancies between simulation and hardware, and relate these errors to physical noise mechanisms such as decoherence times ($T_1$, $T_2$) and readout errors. The results will provide quantitative insight into hardware limitations and contribute to the understanding of gate performance in near-term quantum devices, while demonstrating practical implementation of quantum benchmarking protocols.
+\end{abstract}
+
+\section{Introduction}
+Superconducting qubits are among the leading platforms for near-term quantum computing, offering fast gate operations and scalability potential. However, their performance is limited by decoherence, control errors, and readout imperfections. Quantifying the fidelity of quantum gates is therefore essential to understand hardware limitations and to guide optimisation strategies.
+
+Randomised Benchmarking (RB) is a widely used protocol to measure the average error per Clifford gate in a scalable and robust manner, mitigating the effects of state preparation and measurement errors. Interleaved RB (IRB) extends this approach to estimate the fidelity of specific gates.
+
+In this project, we implement RB and IRB using Qiskit and Qiskit Experiments, executing experiments both in simulators with noise models extracted from IBM Quantum devices and on real superconducting hardware. This approach allows us to compare idealised noise models with actual hardware performance, relate errors to physical mechanisms such as $T_1$, $T_2$, and readout noise, and provide insights into the reliability of quantum operations in near-term devices.
+
+There are various hardware platforms for qubit implementation. As of 2025, the leading technologies for quantum processors, in terms of scalability, use neutral atoms in optical lattices (Atom Computing, $>$1200 qubits~\cite{atomcomputing}), superconducting qubits (IBM, Condor, 1121 qubits~\cite{ibmcondor}), and photonics measured-based (Xanadu, Borealis, 216 qubits~\cite{xanaduborealis}). However, in terms of fidelity, trapped ion technologies seem to be leading the industry (Quantinuum, H2, 99.997\% - 1 qubit, 99.87\% - 2 qubit~\cite{quantinuum}).
+
+\subsection{Scalability vs Fidelity}
+While scalability is a classical concept, it gains new dimension when used in the context of quantum computing. Because qubits rely on nanoscale phenomena, they are highly susceptible to interference, both from environmental noise and neighbouring qubits. For this reason, quantifying the maximum number of qubits that can operate simultaneously without performance loss is a crucial factor in system design~\cite{scalability}.
+
+Fidelity characterizes the agreement between the actual outcome of the operation and the desired state. It generally depends on the initial state on which the operation is applied. Since the operation may generally be applied to any arbitrary state, it is natural to average the fidelity over all pure initial states, chosen uniformly in the system’s Hilbert space.~\cite{fidelity}.
+
+\section{Interleaved Randomised Benchmarking}
+\subsection{Interleaved Randomised Benchmarking}
+Randomised Benchmarking  proves to be advantageous over different qubit characterisation techniques, such as Quantum Process Tomography. While RB is scalable in terms of number of qubits comprising the system, it is also able to provide a noise measure independent of state preparation and measurement errors (SPME)~\cite{rbadvantage}.
+
+The key difference between RB and IRB, is that the first characterises average impact of noise in gates, estimating an average error per Clifford. On the other hand, IRB characterises a particular gate, which is 'interleaved' throughout the standard RB sequence. This protocol extends standard RB by interleaving the gate of interest after every Clifford gate. We can see the difference between the sequences quite clearly:\\
+\begin{align}
+RB_seq = jiji
+\end{align}
+
+ ~\cite{forestbenchmarking}
+
+% References (add these to your bibliography file or thebibliography environment)
+% atomcomputing, ibmcondor, xanaduborealis, quantinuum, scalability, fidelity, rbadvantage
+
+\subsection{Standardised Protocol}
+The protocol that will be followed consists on 3 steps. Firstly, the initial state must be prepared. Then standard RB will be applied, followed by the procedures for survival probability estimation. Finally, gate error will be calculated.
+
+\begin{enumerate}[start=0]
+    \item Fixing the initial state $|\psi\rangle$ \\
+    The initial state will be set as $|\psi\rangle=|0\rangle$, as standard.\\
+    \item Standard RB implementation
+    The Clifford group will be defined according to.
+    \item Interleaving a specific gate
+    \item Gate Error estimation
+\end{enumerate}
+\begin{align}
+F^{(0)}_{\text{seq}}(m, \psi) &= A_0 p^m + B_0, \\
+F^{(1)}_{\text{seq}}(m, \psi) &= A_1 p^m + C_1 (m-1) p^{m-2} + B_1, \nonumber
+\end{align}
+
+
+\begin{thebibliography}{99}
+
+\bibitem{atomcomputing} Atom Computing, \textit{"Highly Scalable Quantum Computing with Neutral Atoms"}, 2023.
+\bibitem{ibmcondor} IBM, \textit{"The hardware and software for the era of quantum utility is here"}, 2023.
+\bibitem{xanaduborealis} Xanadu, \textit{"Beating classical computers with Borealis”}, 2023.
+\bibitem{quantinuum} Quantinuum, \textit{“Quantinuum extends its significant lead in quantum computing, achieving historic milestones for hardware fidelity and Quantum Volume”}, 2024.
+\bibitem{scalability} SPinQ, \textit{"Scalable Quantum Systems: The Path to Quantum Advantage”}, 2025.
+\bibitem{fidelity} L. H. Pedersen, N. M. Møller e K. Mølmer,  \textit{"Fidelity of quantum operations"}, Physics Letters A 367(1-2):47-51, 2007.
+\bibitem{rbadvantage} Author(s),
+\bibitem{forestbenchmarking}
+Forest Benchmarking Documentation, \textit{Randomized Benchmarking (Interleaved)},\\
+\url{https://forest-benchmarking.readthedocs.io/en/latest/examples/randomized_benchmarking_interleaved.html},\\
+Accessed: Dec. 15, 2025.
+
+\end{thebibliography}
+
+\end{document}
+\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{APPENDIX}
+
+Appendixes should appear before the acknowledgment.
+
+\section*{ACKNOWLEDGMENT}
+
+The preferred spelling of the word ``acknowledgment'' in America is without an ``e'' after the ``g''. Avoid the stilted expression, ``One of us (R. B. G.) thanks . . .''  Instead, try ``R. B. G. thanks''. Put sponsor acknowledgments in the unnumbered footnote on the first page.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+References are important to the reader; therefore, each citation must be complete and correct. If at all possible, references should be commonly available publications.
+
+
+
+
+
+\end{document}
