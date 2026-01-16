@@ -10,7 +10,7 @@
 \usepackage{url}
 
 
-\title{Benchmarking Superconducting Qubits with Randomized Benchmarking in Qiskit}
+\title{Benchmarking Superconducting Qubits with Interleaved Randomized Benchmarking}
 \author{Laura L. Vilela, Faculty of Science and Technology, University of Coimbra}
 
 \begin{document}
@@ -24,7 +24,7 @@ This project investigates the fidelity of quantum gates in superconducting qubit
 \section{Introduction}
 Superconducting qubits are among the leading platforms for near-term quantum computing, offering fast gate operations and scalability potential. However, their performance is limited by decoherence, control errors, and readout imperfections. Quantifying the fidelity of quantum gates is therefore essential to understand hardware limitations and to guide optimisation strategies.
 
-Randomised Benchmarking (RB) is a widely used protocol to measure the average error per Clifford gate in a scalable and robust manner, mitigating the effects of state preparation and measurement errors. Interleaved RB (IRB) extends this approach to estimate the fidelity of specific gates.
+Randomised Benchmarking (RB) is a widely used protocol to measure the average error per Clifford gate in a scalable and robust manner, mitigating the effects of state preparation and measurement errors. Interleaved Randomised Benchmarking (IRB) extends this approach to estimate the fidelity of specific gates.
 
 In this project, we implement RB and IRB using Qiskit and Qiskit Experiments, executing experiments both in simulators with noise models extracted from IBM Quantum devices and on real superconducting hardware. This approach allows us to compare idealised noise models with actual hardware performance, relate errors to physical mechanisms such as $T_1$, $T_2$, and readout noise, and provide insights into the reliability of quantum operations in near-term devices.
 
@@ -39,32 +39,83 @@ Fidelity characterizes the agreement between the actual outcome of the operation
 \subsection{Interleaved Randomised Benchmarking}
 Randomised Benchmarking  proves to be advantageous over different qubit characterisation techniques, such as Quantum Process Tomography. While RB is scalable in terms of number of qubits comprising the system, it is also able to provide a noise measure independent of state preparation and measurement errors (SPME)~\cite{rbadvantage}.
 
-The key difference between RB and IRB, is that the first characterises average impact of noise in gates, estimating an average error per Clifford. On the other hand, IRB characterises a particular gate, which is 'interleaved' throughout the standard RB sequence. This protocol extends standard RB by interleaving the gate of interest after every Clifford gate. We can see the difference between the sequences quite clearly:\\
-\begin{align}
-RB_seq = jiji
-\end{align}
+The key difference between RB and IRB, is that the first characterises average impact of noise in gates, estimating an average error per Clifford. On the other hand, IRB characterises a particular gate, which is 'interleaved' throughout the standard RB sequence. This protocol extends standard RB by interleaving the gate of interest after every Clifford gate. We can see the difference between the sequences quite clearly: ~\cite{forestbenchmarking}.
 
- ~\cite{forestbenchmarking}
+\begin{align*}
+RB_{\text{seq}} &= C_1, C_2, C_3, \ldots, C_{\text{N-1}}, C'_{\text{inverse}} \\
+IRB_{\text{seq}} &= C_1, G, C_2, G, C_3, \ldots, C_{\text{N-1}}, G, C'_{\text{inverse}}
+\end{align*}
+
 
 % References (add these to your bibliography file or thebibliography environment)
 % atomcomputing, ibmcondor, xanaduborealis, quantinuum, scalability, fidelity, rbadvantage
 
 \subsection{Standardised Protocol}
-The protocol that will be followed consists on 3 steps. Firstly, the initial state must be prepared. Then standard RB will be applied, followed by the procedures for survival probability estimation. Finally, gate error will be calculated.
+The protocol that will be followed consists of 3 steps. After the initial state is prepared, the standard RB will be applied, followed by the procedures for survival probability estimation. Finally, gate error will be calculated.
 
+%Steps for the protocol
 \begin{enumerate}[start=0]
-    \item Fixing the initial state $|\psi\rangle$ \\
-    The initial state will be set as $|\psi\rangle=|0\rangle$, as standard.\\
-    \item Standard RB implementation
-    The Clifford group will be defined according to.
-    \item Interleaving a specific gate
-    \item Gate Error estimation
-\end{enumerate}
-\begin{align}
-F^{(0)}_{\text{seq}}(m, \psi) &= A_0 p^m + B_0, \\
-F^{(1)}_{\text{seq}}(m, \psi) &= A_1 p^m + C_1 (m-1) p^{m-2} + B_1, \nonumber
-\end{align}
 
+    \item Fixing the initial state $|\psi\rangle$ \\
+    The initial state will be set to $|\psi\rangle=|0\rangle$, as standard. \medskip
+    \item Standard RB implementation \\
+    A $K$ sequence of length $m$ is defined by selecting $m$ gates, chosen uniformly at random, from $Clif_n$. The $(m+i)$-th gate shall be the inverse of the composition of the first $m$ gates, to make the total sequence equal to the identity operation. 
+    Each Clifford element, $C_i$, has associated to it an error $\Lambda_i$. The sequence of gates can then be represented as: \\
+    \begin{align}
+    \mathbf{S}_{im} =\ & \Lambda_{i_{m+1}, m+1} \otimes \mathcal{C}_{i_{m+1}} \otimes \nonumber \\
+    & \left( \bigotimes_{j=1}^{m} \left[ \Lambda_{i_{j}, j} \otimes \mathcal{C}_{i_{j}} \right] \right)
+    \end{align}
+
+    \item Interleaving an arbitrary gate to the RB sequence
+    The $K$ sequences shall be altered so each random Clifford gate, $C_i$, is followed by the target gate, $C$. This way, the sequence is constructed by alternating between uniformly random Clifford elements and the target gate up to the $m$-th random gate. Similarly to RB, the $(m+1)$-th fate is chosen to be the inverse of the composition that precedes it. The superoperator that represents this sequence is:
+    \begin{align}
+        \mathcal{V}_{i_m}=\ &\Lambda_{i_{m+1}, m+1} \otimes \mathcal{C}_{i_{m+1}} \otimes \nonumber \\
+    & \left( \bigotimes_{j=1}^{m} \left[\mathcal{C}\otimes \Lambda_C \otimes \Lambda_{i_{j}, j} \otimes \mathcal{C}_{i_{j}} \right] \right)
+    \end{align}
+    
+    \item Gate Error estimation %STEP 3_________________________________________
+    For each $K$ sequence, survival probability, $p$ is measured. This is the probability that the initial state is not changed by the sequence.
+    
+    \begin{equation}
+        p = Tr[E_\psi \mathcal{V}_{i_m} (\rho_\psi)]\\
+    \end{equation}
+    
+    Here $\mathcal{V}_{i_m}$ is the positive operator valued measurement element that takes into account measurement errors and $(\rho_\psi)$ is a quantum state that takes into account state preparation errors. The survival probability shall be averaged over the $K$ random sequences in order to find the sequence fidelity, $F_{\overline{\text{seq}}}(m,\psi)$. This value is then fit to either the zeroth or first order model:
+    \begin{align}
+    F^{(0)}_{\text{seq}}(m, \psi) &= A_0 p^m + B_0, \\
+    F^{(1)}_{\text{seq}}(m, \psi) &= A_1 p^m + C_1 (m-1) p^{m-2} + B_1, \nonumber
+    \end{align}
+
+    These equations let us obtain the depolarizing parameter, $p_{\overline{c}}$. The gate error of $\Lambda_C$ (which is directly is estimated by ($r_\mathcal{C}=1-\text{average gate fidelity of } \Lambda_\mathcal{C}$)
+\end{enumerate}
+
+\section{Simulation with Noisy Channels}
+In this section, we simulate quantum circuits using noise models that emulate real devices. For practical purposes, the IBM hardware platform chosen to be emulated were the circuits of the "ibm\textunderscore fez" server. The server has the following properties:
+
+%%%TABELA PROPRIEDADES DO ibm_fez
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Property} & \textbf{Value} \\
+\hline
+Backend Name & \verb|ibm_fez| \\
+Qubits & 156 \\
+Basis Gates & CS, Id, RX, RZ, RZZ, SX, X \\
+CZ error (median) & $2.752\times 10^{-3}$ \\
+SX error (median)& $2.705 \times10^{-4}$ \\
+Readout Error (median) & $9.70 \times 10^{-3}$ \\ 
+T$_1$ (median) & $137.23\, \mu s$ \\
+T$_2$ (median) & $92.97\, \mu s$  \\
+%%%
+
+\hline
+\end{tabular}
+\caption{Properties of the \texttt{ibm\_fez} server.}
+\end{table}
+
+\section{Hardware Implementation}
+Runs on real hardware.
 
 \begin{thebibliography}{99}
 
@@ -102,12 +153,6 @@ Accessed: Dec. 15, 2025.
 \section*{APPENDIX}
 
 Appendixes should appear before the acknowledgment.
-
-\section*{ACKNOWLEDGMENT}
-
-The preferred spelling of the word ``acknowledgment'' in America is without an ``e'' after the ``g''. Avoid the stilted expression, ``One of us (R. B. G.) thanks . . .''  Instead, try ``R. B. G. thanks''. Put sponsor acknowledgments in the unnumbered footnote on the first page.
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
