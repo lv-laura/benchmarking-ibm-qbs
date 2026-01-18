@@ -8,12 +8,29 @@
 \usepackage{amsmath}
 \usepackage{enumitem}
 \usepackage{url}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{multirow}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  columns=fullflexible
+}
 
 
 \title{Benchmarking Superconducting Qubits with Interleaved Randomized Benchmarking}
 \author{Laura L. Vilela, Faculty of Science and Technology, University of Coimbra}
 
 \begin{document}
+\pagestyle{plain}
 
 \maketitle
 
@@ -65,28 +82,62 @@ The protocol that will be followed consists of 3 steps. After the initial state 
     \mathbf{S}_{im} =\ & \Lambda_{i_{m+1}, m+1} \otimes \mathcal{C}_{i_{m+1}} \otimes \nonumber \\
     & \left( \bigotimes_{j=1}^{m} \left[ \Lambda_{i_{j}, j} \otimes \mathcal{C}_{i_{j}} \right] \right)
     \end{align}
+    
+    For each $K$ sequence, survival probability, $p$ is measured. This is the probability that the initial state is not changed by the sequence.
+    
+    \begin{equation}
+        S_p = Tr[E_\psi \mathcal{S}_{i_m} (\rho_\psi)]\\
+    \end{equation}
+    
+    Here $E_\psi$ is the positive operator valued measurement element that takes into account measurement errors and $(\rho_\psi)$ is a quantum state that takes into account state preparation errors. The survival probability shall be averaged over the $K$ random sequences in order to find the sequence fidelity, $F_{{\text{seq}}}(m,\psi)$. This value is then fit to either the zeroth or first order model:
+    
+    \begin{align}
+    F^{(0)}_{\text{seq}}(m, \psi) &= A_0 p^m + B_0, \\
+    F^{(1)}_{\text{seq}}(m, \psi) &= A_1 p^m + C_1 (m-1) p^{m-2} + B_1, \nonumber
+    \end{align}
+    
+    This fit gives the depolarising parameter, $p$. This allows to calculate the average error gate over all Clifford gates, $r$.
 
-    \item Interleaving an arbitrary gate to the RB sequence
+    \begin{align}
+        r=(d-1)(1-p)/d
+    \end{align}
+
+    \item Interleaving an arbitrary gate to the RB sequence %STEP 2______
+    
     The $K$ sequences shall be altered so each random Clifford gate, $C_i$, is followed by the target gate, $C$. This way, the sequence is constructed by alternating between uniformly random Clifford elements and the target gate up to the $m$-th random gate. Similarly to RB, the $(m+1)$-th fate is chosen to be the inverse of the composition that precedes it. The superoperator that represents this sequence is:
     \begin{align}
         \mathcal{V}_{i_m}=\ &\Lambda_{i_{m+1}, m+1} \otimes \mathcal{C}_{i_{m+1}} \otimes \nonumber \\
     & \left( \bigotimes_{j=1}^{m} \left[\mathcal{C}\otimes \Lambda_C \otimes \Lambda_{i_{j}, j} \otimes \mathcal{C}_{i_{j}} \right] \right)
     \end{align}
-    
+
     \item Gate Error estimation %STEP 3_________________________________________
-    For each $K$ sequence, survival probability, $p$ is measured. This is the probability that the initial state is not changed by the sequence.
+    Analogously to standardised RB, For each $K$ sequence, survival probability, $p$ is measured. 
     
     \begin{equation}
-        p = Tr[E_\psi \mathcal{V}_{i_m} (\rho_\psi)]\\
+        S_p = Tr[E_\psi \mathcal{V}_{i_m} (\rho_\psi)]\\
     \end{equation}
     
-    Here $\mathcal{V}_{i_m}$ is the positive operator valued measurement element that takes into account measurement errors and $(\rho_\psi)$ is a quantum state that takes into account state preparation errors. The survival probability shall be averaged over the $K$ random sequences in order to find the sequence fidelity, $F_{\overline{\text{seq}}}(m,\psi)$. This value is then fit to either the zeroth or first order model:
-    \begin{align}
-    F^{(0)}_{\text{seq}}(m, \psi) &= A_0 p^m + B_0, \\
-    F^{(1)}_{\text{seq}}(m, \psi) &= A_1 p^m + C_1 (m-1) p^{m-2} + B_1, \nonumber
-    \end{align}
+    By averaging this value over all $K$ sequences, we can find the new gate fidelity, $F_{\overline{\text{seq}}}(m,\psi)$. By using equation (3), fitting $F_{\overline{\text{seq}}}(m,\psi)$ allows us to calculate the depolarising parameter $p_{\overline{c}}$, where $F_{\overline{\text{seq}}}(m,\psi)$ substitutes $p$ in the expressions.
 
-    These equations let us obtain the depolarizing parameter, $p_{\overline{c}}$. The gate error of $\Lambda_C$ (which is directly is estimated by ($r_\mathcal{C}=1-\text{average gate fidelity of } \Lambda_\mathcal{C}$)
+    The gate error of $\Lambda_C$ (which is directly is estimated by ($r_\mathcal{C}=1-\text{average gate fidelity of } \Lambda_\mathcal{C}$) is calculated from the values obtained for $p$ and $p_{\overline{c}}$:
+
+    \begin{equation}
+    r_c^{\text{est}} = \frac{(d-1)\left(1-\frac{p_{\overline{c}}}{p}\right)}{d} \pm E.
+    \end{equation}
+
+    Here $E$ is the error in our estimate and is given by:
+    
+    \begin{equation}
+    E = \min \left\{
+    \begin{array}{l}
+    \displaystyle
+    \frac{(d-1)\left|p - \frac{p_{\overline{c}}}{p}\right| + (1-p)}{d} \\[2ex]
+    \displaystyle
+    \frac{2(d^2-1)(1-p)}{pd^2} + \frac{4\sqrt{1-p}\sqrt{d^2-1}}{p}
+    \end{array}
+    \right.
+    \end{equation}
+    
 \end{enumerate}
 
 \section{Simulation with Noisy Channels}
@@ -107,12 +158,154 @@ SX error (median)& $2.705 \times10^{-4}$ \\
 Readout Error (median) & $9.70 \times 10^{-3}$ \\ 
 T$_1$ (median) & $137.23\, \mu s$ \\
 T$_2$ (median) & $92.97\, \mu s$  \\
-%%%
 
 \hline
 \end{tabular}
 \caption{Properties of the \texttt{ibm\_fez} server.}
 \end{table}
+%%%
+
+The gate fidelities for gates $X$, $SX$, $RX$, $RZ$ and $CS$ were calculated using the protocol listed above. All code used to obtain the following results can be consulted in the annex.
+
+\subsection{Single-Qubit Gates}
+We will start by analysing the single-qubit gates $X$, $SX$, $RX$ and $RZ$.
+\begin{enumerate}
+    \item $X$ Gate\\ %Gate X_____________________________________________
+    The following table shows the fit parameters obtained after performing RB on Gate $X$:
+    
+    %%%TABELA FIT RB de X
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    & Parameters & $F^{(0)}_{\text{seq}}$ & $F^{(1)}_{\text{seq}}$ \\
+    \hline
+    \multirow{5}{*}{RB} 
+        & A & $0.6974$ & $0.4886$ \\
+        & B & $0.2993$ & $0.5076$ \\
+        & C & - & $0.0001$ \\
+        & p & $0.9999$ & $0.999811$ \\
+        & r & $5.000\times 10^{-5}$ & $9.400\times 10^{-5}$ \\
+    \hline
+    \multirow{5}{*}{IRB} 
+        & A & $0.698463$ & $0.487385$ \\
+        & B & $0.298272$ & $0.508942$ \\
+        & C & - & $0.000053$ \\
+        & $p_{\overline{c}}$ & $0.9999$ & $0.99989679$ \\
+        & $r_c$ & $5.000\times 10^{-5}$ & $5.160\times 10^{-5}$ \\
+    \hline
+    \end{tabular}
+    \caption{Simulation results for Gate $X$.}
+    \end{table}
+
+    The graphs below correspond to the data presented in Table II. 
+      
+    \begin{figure}[H]
+        \centering
+          \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade X - RB.png}
+            \label{fig:1a}
+          \end{subfigure}
+          \hfill
+          \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade X - IRB.png}
+            \label{fig:1b}
+          \end{subfigure}
+          \caption{Fidelity of $X$ via Standard RB (top) and Interleaved RB (bottom)}
+          \label{fig:combined}
+    \end{figure}
+
+    For these parameters, the resulting gate fidelity was $100\%$ for zero-th order and $100\%$ for the first order. As we can see from the table, the gate errors $r$ and $r_c$ are extremely small, leading to very high fidelity.\\
+    
+    \item $SX$ Gate \\%Gate SX_____________________________________________
+    The following table presents the fit parameters obtained from RB of the gate $SX$. A first-order fit could not be performed in this case. However, since the $SX$ gate is equivalent to an $RZ(\pi/2)$ rotation, we expect the results to closely resemble those from the $RZ$ gate characterisation discussed below.
+   
+    %%%TABELA FIT de SX
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|}
+    \hline
+    & Parameters & $F^{(0)}_{\text{seq}}$ \\
+    \hline
+    \multirow{5}{*}{RB} 
+        & A & $0.6974$ \\
+        & B & $0.2993$ \\
+        & p & $0.9999$\\
+        & r & $5.00\times 10^{-5}$\\
+    \hline
+    \multirow{5}{*}{IRB} 
+        & A & $0.6974$\\
+        & B & $0.2993$\\
+        & $p_{\overline{c}}$ & $0.9999$\\
+        & $r_c$ & $5.00\times 10^{-5}$\\
+    \hline
+    \end{tabular}
+    \caption{Simulation results for Gate $SX$.}
+    \end{table}
+
+    %Gráficos de SX
+    \begin{figure}[H]
+        \centering
+          \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade SX - RB.png}
+            \label{fig:1a}
+          \end{subfigure}
+          \hfill
+          \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade SX - IRB.png}
+            \label{fig:1b}
+          \end{subfigure}
+          \caption{Fidelity of $RX$ via Standard RB (top) and Interleaved RB (bottom).}
+          \label{fig:combined}
+    \end{figure}
+    
+    \item $RX$ Gate \\ %Gate RX_____________________________________________
+    
+    a
+    \begin{figure}[H]
+        \centering
+          \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade RX - RB.png}
+            \label{fig:1a}
+          \end{subfigure}
+          \hfill
+          \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade RX - IRB.png}
+            \label{fig:1b}
+          \end{subfigure}
+          \caption{Fidelity of $RX$ via Standard RB (top) and Interleaved RB (bottom).}
+          \label{fig:combined}
+    \end{figure}
+    
+    \item $RZ$ Gate \\ %Gate RZ_____________________________________________
+    
+     poop
+    \begin{figure}[H]
+    \centering
+      \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade RZ - RB.png}
+        \label{fig:1a}
+      \end{subfigure}
+      \hfill
+      \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade RZ - IRB.png}
+        \label{fig:1b}
+      \end{subfigure}
+      \caption{Fidelity of $RZ$ via Standard RB (top) and Interleaved RB (bottom).}
+      \label{fig:combined}
+    \end{figure}
+    
+\end{enumerate}
+
+\subsection{Two-Qubit Gates}
 
 \section{Hardware Implementation}
 Runs on real hardware.
@@ -133,6 +326,21 @@ Accessed: Dec. 15, 2025.
 
 \end{thebibliography}
 
+\newpage
+\section*{APPENDIX}
+The code used is provided here.
+
+\begin{enumerate}
+    \item Standard RB and $p$ extraction
+    \begin{lstlisting}[language=Python, caption={Simulation Code}]
+    # Your code here
+    def example():
+        print("Hello, world!")
+    \end{lstlisting}
+    
+\end{enumerate}
+
+Appendixes should appear before the acknowledgment.
 \end{document}
 \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
                                   % on the last page of the document manually. It shortens
@@ -150,9 +358,7 @@ Accessed: Dec. 15, 2025.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{APPENDIX}
 
-Appendixes should appear before the acknowledgment.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
