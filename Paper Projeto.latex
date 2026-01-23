@@ -76,7 +76,7 @@ The protocol that will be followed consists of 3 steps. After the initial state 
     \item Fixing the initial state $|\psi\rangle$ \\
     The initial state will be set to $|\psi\rangle=|0\rangle$, as standard. \medskip
     \item Standard RB implementation \\
-    A $K$ sequence of length $m$ is defined by selecting $m$ gates, chosen uniformly at random, from $Clif_n$. The $(m+i)$-th gate shall be the inverse of the composition of the first $m$ gates, to make the total sequence equal to the identity operation. 
+    A $K$ sequence of length $m$ is defined by selecting $m$ gates, chosen uniformly at random, from $\text{Clif}_n$. The $(m+i)$-th gate shall be the inverse of the composition of the first $m$ gates, to make the total sequence equal to the identity operation. 
     Each Clifford element, $C_i$, has associated to it an error $\Lambda_i$. The sequence of gates can then be represented as: \\
     \begin{align}
     \mathbf{S}_{im} =\ & \Lambda_{i_{m+1}, m+1} \otimes \mathcal{C}_{i_{m+1}} \otimes \nonumber \\
@@ -140,6 +140,13 @@ The protocol that will be followed consists of 3 steps. After the initial state 
     
 \end{enumerate}
 
+\subsection{Two-Qubit Protocol}
+As can be seen in Ref ~\cite{2qbprotocol} The two-qubit protocol uses the same mathematical formulas to fit, obtain parameters $p$ and $p_{\overline{c}}$ and calculate $r$ and $r_C$. The main difference lies in how the sequences are defined.
+    \begin{enumerate}
+        \item RB Sequence
+        Similarly, a sequence K of length m is constructed by selecting gates from $\text{Clif}_n$ at random. From this sequence, a series of truncations $t_i$ is constructed, where $t_i = {C_1, ...,C_N}$
+    \end{enumerate}
+
 \section{Simulation with Noisy Channels}
 In this section, we simulate quantum circuits using noise models that emulate real devices. For practical purposes, the IBM hardware platform chosen to be emulated were the circuits of the "ibm\textunderscore fez" server. The server has the following properties:
 
@@ -152,7 +159,7 @@ In this section, we simulate quantum circuits using noise models that emulate re
 \hline
 Backend Name & \verb|ibm_fez| \\
 Qubits & 156 \\
-Basis Gates & CS, Id, RX, RZ, RZZ, SX, X \\
+Basis Gates & CZ, Id, RX, RZ, RZZ, SX, X \\
 CZ error (median) & $2.752\times 10^{-3}$ \\
 SX error (median)& $2.705 \times10^{-4}$ \\
 Readout Error (median) & $9.70 \times 10^{-3}$ \\ 
@@ -171,7 +178,7 @@ The gate fidelities for gates $X$, $SX$, $RX$, $RZ$ and $CS$ were calculated usi
 We will start by analysing the single-qubit gates $X$, $SX$, $RX$ and $RZ$.
 \begin{enumerate}
     \item $X$ Gate\\ %Gate X_____________________________________________
-    The following table shows the fit parameters obtained after performing RB on Gate $X$:
+    The following table shows the fit parameters obtained from performing RB and IRB of Gate $X$:
     
     %%%TABELA FIT RB de X
     \begin{table}[h]
@@ -216,11 +223,11 @@ We will start by analysing the single-qubit gates $X$, $SX$, $RX$ and $RZ$.
           \caption{Fidelity of $X$ via Standard RB (top) and Interleaved RB (bottom)}
           \label{fig:combined}
     \end{figure}
-
-    For these parameters, the resulting gate fidelity was $100\%$ for zero-th order and $100\%$ for the first order. As we can see from the table, the gate errors $r$ and $r_c$ are extremely small, leading to very high fidelity.\\
+    
+    For these parameters, the resulting gate fidelity was $100.00\%$ for zero-th order and $100.00\%$ for the first order. As we can see from the table, the gate errors $r$ and $r_c$ are extremely small, leading to very high fidelity.
     
     \item $SX$ Gate \\%Gate SX_____________________________________________
-    The following table presents the fit parameters obtained from RB of the gate $SX$. A first-order fit could not be performed in this case. However, since the $SX$ gate is equivalent to an $RZ(\pi/2)$ rotation, we expect the results to closely resemble those from the $RZ$ gate characterisation discussed below.
+    The following table presents the fit parameters obtained from RB of the gate $SX$. A first-order fit could not be performed in this case. However, since the $SX$ gate is equivalent to an $RX(\pi/2)$ rotation, we expect the results to closely resemble those from the $RX$ gate characterisation discussed below.
    
     %%%TABELA FIT de SX
     \begin{table}[h]
@@ -230,20 +237,22 @@ We will start by analysing the single-qubit gates $X$, $SX$, $RX$ and $RZ$.
     & Parameters & $F^{(0)}_{\text{seq}}$ \\
     \hline
     \multirow{5}{*}{RB} 
-        & A & $0.6974$ \\
-        & B & $0.2993$ \\
+        & A & $0.697551$ \\
+        & B & $0.299712$ \\
         & p & $0.9999$\\
         & r & $5.00\times 10^{-5}$\\
     \hline
     \multirow{5}{*}{IRB} 
-        & A & $0.6974$\\
-        & B & $0.2993$\\
+        & A & $0.698452$\\
+        & B & $0.298869$\\
         & $p_{\overline{c}}$ & $0.9999$\\
         & $r_c$ & $5.00\times 10^{-5}$\\
     \hline
     \end{tabular}
     \caption{Simulation results for Gate $SX$.}
     \end{table}
+
+    The graphs below correspond to the data presented in Table III.
 
     %Gráficos de SX
     \begin{figure}[H]
@@ -259,13 +268,41 @@ We will start by analysing the single-qubit gates $X$, $SX$, $RX$ and $RZ$.
             \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade SX - IRB.png}
             \label{fig:1b}
           \end{subfigure}
-          \caption{Fidelity of $RX$ via Standard RB (top) and Interleaved RB (bottom).}
+          \caption{Fidelity of $SX$ via Standard RB (top) and Interleaved RB (bottom).}
           \label{fig:combined}
     \end{figure}
+    FIDELITY: 0) $100.00\%$ , 1) nope
     
     \item $RX$ Gate \\ %Gate RX_____________________________________________
+    The following table shows the fit parameters obtained from performing RB and IRB of Gate $RX$:
+
+    %TABELA de RX_____
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    & Parameters & $F^{(0)}_{\text{seq}}$ & $F^{(1)}_{\text{seq}}$ \\
+    \hline
+    \multirow{5}{*}{RB} 
+        & A & $0.698991$ & $0.487851$ \\
+        & B & $0.298591$ & $0.509355$ \\
+        & C & - & $0.000091$ \\
+        & p & $0.9999$ & $0.99981987$ \\
+        & r & $2.98591\times 10^{-1}$ & $9.006\times 10^{-5}$ \\
+    \hline
+    \multirow{5}{*}{IRB} 
+        & A & $0.698509$ & $0.648785$ \\
+        & B & $0.29878$ & $0.352602$ \\
+        & C & - & $0.005299$ \\
+        & $p_{\overline{c}}$ & $0.9999$ & $0.99214165$ \\
+        & $r_c$ & $5.000\times 10^{-5}$ & $3.8398\times 10^{-3}$ \\
+    \hline
+    \end{tabular}
+    \caption{Simulation results for Gate $RX$.}
+    \end{table}
     
-    a
+    The graphs below correspond to the data presented in Table IV. 
+    %GRÁFICOS de RX
     \begin{figure}[H]
         \centering
           \begin{subfigure}[b]{0.45\textwidth}
@@ -283,9 +320,39 @@ We will start by analysing the single-qubit gates $X$, $SX$, $RX$ and $RZ$.
           \label{fig:combined}
     \end{figure}
     
-    \item $RZ$ Gate \\ %Gate RZ_____________________________________________
+    FIDELITY: 0) $100.00\%$ , 1) $99.61602\%$
     
-     poop
+    \item $RZ$ Gate \\ %Gate RZ_________________________________________
+    The following table shows the fit parameters obtained from performing RB and IRB of Gate $RZ$:
+    
+    %TABELA de RZ_____
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    & Parameters & $F^{(0)}_{\text{seq}}$ & $F^{(1)}_{\text{seq}}$ \\
+    \hline
+    \multirow{5}{*}{RB} 
+        & A & $0.697968$ & $0.496473$ \\
+        & B & $0.299549$ & $0.502408$ \\
+        & C & - & $0.001798$ \\
+        & p & $0.9999$ & $0.99639975$ \\
+        & r & $5.000\times 10^{-5}$ & $1,80012\times 10^{-3}$ \\
+    \hline
+    \multirow{5}{*}{IRB} 
+        & A & $0.698561$ & $0.486923$ \\
+        & B & $0.298963$ & $0.510431$ \\
+        & C & - & $0.000358$ \\
+        & $p_{\overline{c}}$ & $0.9999$ & $0.99214165$ \\
+        & $r_c$ & $5.000\times 10^{-5}$ & $3,5388\times 10^{-4}$ \\
+    \hline
+    \end{tabular}
+    \caption{Simulation results for Gate $RZ$.}
+    \end{table}
+    
+    The graphs below correspond to the data presented in Table V.
+    
+    %%%GRÁFICOS DE RZ
     \begin{figure}[H]
     \centering
       \begin{subfigure}[b]{0.45\textwidth}
@@ -303,12 +370,118 @@ We will start by analysing the single-qubit gates $X$, $SX$, $RX$ and $RZ$.
       \label{fig:combined}
     \end{figure}
     
+    FIDELITY: 0) $100.00\%$ , 1) $100\%$
+    
 \end{enumerate}
 
 \subsection{Two-Qubit Gates}
+Now we teste the two-qubit gates.
+
+\begin{enumerate}
+    \item $CZ$ Gate % GATE CZ___________________________________________
+    This is the information on CZ.
+
+    %TABELA de CZ_____
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    & Parameters & $F^{(0)}_{\text{seq}}$ & $F^{(1)}_{\text{seq}}$ \\
+    \hline
+    \multirow{5}{*}{RB} 
+        & A & $0.706472$ & $0.794273$ \\
+        & B & $0.28618$ & $0.205322$ \\
+        & C & - & $0.008337$ \\
+        & p & $0.99988424$ & $0.98988376$ \\
+        & r & $8.682\times 10^{-5}$ & $5,05812\times 10^{-3}$ \\
+    \hline
+    \multirow{5}{*}{IRB} 
+        & A & $0.693728$ & $0.486923$ \\
+        & B & $0.298643$ & $0.510431$ \\
+        & C & - & $0.000358$ \\
+        & $p_{\overline{c}}$ & $0.9999$ & $0.90000001$ \\
+        & $r_c$ & $7.500\times 10^{-5}$ & $5,000\times 10^{-2}$ \\
+    \hline
+    \end{tabular}
+    \caption{Simulation results for Gate $CZ$.}
+    \end{table}
+    
+    The graphs below correspond to the data presented in Table VI.
+    
+     %%%GRÁFICOS DE CZ
+    \begin{figure}[H]
+    \centering
+      \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade CZ - RB.png}
+        \label{fig:1a}
+      \end{subfigure}
+      \hfill
+      \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade CZ - IRB.png}
+        \label{fig:1b}
+      \end{subfigure}
+      \caption{Fidelity of $CZ$ via Standard RB (top) and Interleaved RB (bottom).}
+      \label{fig:combined}
+    \end{figure}
+    
+    FIDELITY: 0) $99.991318\%$ , 1) $95.459883\%$
+    
+    \item $RZZ$ Gate \\ %GATE RZZ___________________________________
+    This is the information of RZZ.
+
+    %%%TABELA da gate RZZ
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    & Parameters & $F^{(0)}_{\text{seq}}$ & $F^{(1)}_{\text{seq}}$ \\
+    \hline
+    \multirow{5}{*}{RB} 
+        & A & $0.700427$ & $0.484393$ \\
+        & B & $0.291694$ & $0.508066$ \\
+        & C & - & $0.00036$ \\
+        & p & $0.99989992$ & $0.99912006$ \\
+        & r & $7.506\times 10^{-5}$ & $4,3997\times 10^{-4}$ \\
+    \hline
+    \multirow{5}{*}{IRB} 
+        & A & $0.698109$ & $0.486604$ \\
+        & B & $0.293991$ & $0.506211$ \\
+        & C & - & $0.000768$ \\
+        & $p_{\overline{c}}$ & $0.99989999$ & $0.9982997$ \\
+        & $r_c$ & $7.501\times 10^{-5}$ & $8.5015\times 10^{-4}$ \\
+    \hline
+    \end{tabular}
+    \caption{Simulation results for Gate $RZZ$.}
+    \end{table}
+
+    This is the Graph
+     %%%GRÁFICOS DE RZZ
+    \begin{figure}[H]
+    \centering
+      \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade RZZ - RB.png}
+        \label{fig:1a}
+      \end{subfigure}
+      \hfill
+      \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{Gráficos/Fidelidade RZZ - IRB.png}
+        \label{fig:1b}
+      \end{subfigure}
+      \caption{Fidelity of $RZZ$ via Standard RB (top) and Interleaved RB (bottom).}
+      \label{fig:combined}
+    \end{figure}
+
+    FIDELITY: 0) $100.00\%$ , 1) $99.958946\%$
+\end{enumerate}
+
+This is the information on RZZ.
 
 \section{Hardware Implementation}
-Runs on real hardware.
+On this section, the RB and IRB protocols are executed on real quantum hardware. Due to the IBM Quantum Platform's maximum job duration of 10 minutes, benchmarking two-qubit gates was not feasible. To enable the evaluation of single-qubit gates within this time constraint, sequence length, number of shots and the number of sequences were reduced to reasonable values ensuring smaller runtime.
 
 \begin{thebibliography}{99}
 
@@ -317,10 +490,11 @@ Runs on real hardware.
 \bibitem{xanaduborealis} Xanadu, \textit{"Beating classical computers with Borealis”}, 2023.
 \bibitem{quantinuum} Quantinuum, \textit{“Quantinuum extends its significant lead in quantum computing, achieving historic milestones for hardware fidelity and Quantum Volume”}, 2024.
 \bibitem{scalability} SPinQ, \textit{"Scalable Quantum Systems: The Path to Quantum Advantage”}, 2025.
-\bibitem{fidelity} L. H. Pedersen, N. M. Møller e K. Mølmer,  \textit{"Fidelity of quantum operations"}, Physics Letters A 367(1-2):47-51, 2007.
-\bibitem{rbadvantage} Author(s),
+\bibitem{fidelity} L. H. Pedersen, N. M. Møller, K. Mølmer,  \textit{"Fidelity of quantum operations"}, Physics Letters A 367(1-2):47-51, 2007.
+\bibitem{rbadvantage} Jay M. Gambetta,A. D. Córcoles, S. T. Merkel, B. R. Johnson, John A. Smolin, Jerry M. Chow, Colm A. Ryan, Chad Rigetti, S. Poletto, Thomas A. Ohki, Mark B. Ketchen, M. Steffen1, \textit{"Characterization of addressability by simultaneous randomized benchmarking"} \\
 \bibitem{forestbenchmarking}
 Forest Benchmarking Documentation, \textit{Randomized Benchmarking (Interleaved)},\\
+\\bibitem{2qbprotocol}, 
 \url{https://forest-benchmarking.readthedocs.io/en/latest/examples/randomized_benchmarking_interleaved.html},\\
 Accessed: Dec. 15, 2025.
 
@@ -340,7 +514,6 @@ The code used is provided here.
     
 \end{enumerate}
 
-Appendixes should appear before the acknowledgment.
 \end{document}
 \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
                                   % on the last page of the document manually. It shortens
