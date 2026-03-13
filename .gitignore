@@ -1,3 +1,4 @@
 # Ignore IBM details file
 ibm_details.txt
 noise_simulations.ipynb
+.gitignore
